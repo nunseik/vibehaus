@@ -4,7 +4,6 @@ import type { CommentWithAuthor } from '../supabase/types'
 
 function makeComment(overrides: Partial<CommentWithAuthor> & { id: string }): CommentWithAuthor {
   return {
-    id: overrides.id,
     post_id: 'post-1',
     author_id: 'user-1',
     parent_id: null,
