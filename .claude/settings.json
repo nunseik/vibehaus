@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // empty'); [[ \"$cmd\" != git\\ push* ]] && exit 0; bash .claude/hooks/check-tests-before-push.sh",
+            "statusMessage": "Checking test coverage before push..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(jq -r '.tool_input.file_path // empty'); [[ -z \"$file\" ]] && exit 0; [[ \"$file\" =~ __tests__ ]] || [[ \"$file\" =~ \\.test\\. ]] || [[ \"$file\" =~ \\.spec\\. ]] && exit 0; [[ \"$file\" =~ /src/(lib|components)/ ]] || exit 0; dir=$(dirname \"$file\"); base=$(basename \"$file\"); base=\"${base%.tsx}\"; base=\"${base%.ts}\"; if ! ls \"${dir}/__tests__/${base}.test.\"* 2>/dev/null | grep -q .; then ctx=\"No test file found for ${file##*/Users/fabio/workspace/vibehaus/} — consider adding ${base}.test.ts in $(dirname \"${file##*/Users/fabio/workspace/vibehaus/}\")/__tests__/\"; echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PostToolUse\\\",\\\"additionalContext\\\":\\\"$ctx\\\"}}\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
