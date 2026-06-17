@@ -7,21 +7,32 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Link2, Zap } from 'lucide-react'
 
+type Mode = 'sign-in' | 'sign-up'
+
 export default function AuthPage() {
+  const [mode, setMode] = useState<Mode>('sign-in')
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleMagicLink(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    setError(null)
     const supabase = createClient()
-    await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${location.origin}/auth/callback` },
-    })
-    setSent(true)
-    setLoading(false)
+
+    const { error } =
+      mode === 'sign-up'
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password })
+
+    if (error) {
+      setError(error.message)
+      setLoading(false)
+    } else {
+      window.location.href = '/'
+    }
   }
 
   async function handleGitHub() {
@@ -42,49 +53,67 @@ export default function AuthPage() {
         <p className="text-sm text-muted-foreground">The community for vibe coders</p>
       </div>
 
-      {sent ? (
-        <div className="rounded-lg border border-border p-4 text-center space-y-2">
-          <p className="font-medium">Check your email ✉️</p>
-          <p className="text-sm text-muted-foreground">We sent a magic link to {email}</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGitHub}
-          >
-            <Link2 className="w-4 h-4 mr-2" />
-            Continue with GitHub
-          </Button>
+      <div className="space-y-4">
+        <Button variant="outline" className="w-full" onClick={handleGitHub}>
+          <Link2 className="w-4 h-4 mr-2" />
+          Continue with GitHub
+        </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs text-muted-foreground">
-              <span className="bg-background px-2">or</span>
-            </div>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
           </div>
-
-          <form onSubmit={handleMagicLink} className="space-y-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Sending…' : 'Send magic link'}
-            </Button>
-          </form>
+          <div className="relative flex justify-center text-xs text-muted-foreground">
+            <span className="bg-background px-2">or</span>
+          </div>
         </div>
-      )}
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? '…' : mode === 'sign-in' ? 'Sign in' : 'Create account'}
+          </Button>
+        </form>
+
+        <p className="text-center text-sm text-muted-foreground">
+          {mode === 'sign-in' ? (
+            <>No account?{' '}
+              <button className="underline" onClick={() => { setMode('sign-up'); setError(null) }}>
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>Already have one?{' '}
+              <button className="underline" onClick={() => { setMode('sign-in'); setError(null) }}>
+                Sign in
+              </button>
+            </>
+          )}
+        </p>
+      </div>
     </div>
   )
 }
