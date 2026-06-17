@@ -174,12 +174,81 @@ https://tczeoaadasbgxjwhnklc.supabase.co/auth/v1/callback
 
 Enable both in Supabase Dashboard → Authentication → Providers.
 
-## Running Tests / Type Checks
+## Testing
+
+The project uses [Vitest](https://vitest.dev/) with jsdom and `@testing-library/react`.
 
 ```bash
-npm run build       # full type check + build
+npm test            # run all tests once
+npm run test:watch  # watch mode
 npx tsc --noEmit    # type check only
 ```
+
+### Test structure
+
+Tests live co-located with the source they cover, in `__tests__/` subdirectories:
+
+```
+src/lib/__tests__/
+│   utils.test.ts           # cn, formatDistanceToNow
+│   commentTree.test.ts     # buildTree
+src/lib/actions/__tests__/
+│   votes.test.ts           # castVote, getUserVoteForPost
+│   posts.test.ts           # createPost, deletePost
+│   comments.test.ts        # createComment, deleteComment
+src/lib/queries/__tests__/
+│   posts.test.ts           # getOrderColumns, normalizePostTags
+```
+
+### Writing tests for server actions
+
+Server actions depend on `next/cache`, `next/navigation`, and `@/lib/supabase/server` — mock all three at the top of the test file:
+
+```ts
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
+vi.mock('next/navigation', () => ({ redirect: vi.fn() }))
+vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }))
+```
+
+The Supabase client mock uses a thenable chain so both `.single()` (returns a Promise) and bare `await query.delete().eq()...` patterns work:
+
+```ts
+function makeChain() {
+  const chain: any = {
+    then(res: Function, rej?: Function) {
+      return Promise.resolve({ data: null, error: null }).then(res as any, rej as any)
+    },
+  }
+  for (const m of ['select', 'eq', 'delete', 'update', 'insert']) {
+    chain[m] = vi.fn().mockReturnValue(chain)
+  }
+  chain.single = vi.fn().mockResolvedValue({ data: null, error: null })
+  return chain
+}
+```
+
+### Keeping pure helpers testable
+
+- `buildTree` (comment nesting) lives in `src/lib/commentTree.ts` — extracted from `CommentThread.tsx` so it can be tested without React/Next.js imports.
+- `getOrderColumns` and `normalizePostTags` in `src/lib/queries/posts.ts` are exported so they can be tested directly.
+
+## CI
+
+GitHub Actions runs on every push to `main` and every PR (`.github/workflows/ci.yml`):
+
+1. `npm ci` — clean install from lock file
+2. `npm test` — Vitest unit tests
+3. `npx tsc --noEmit` — TypeScript type check
+
+> **Lock file note:** testing deps were installed with `--legacy-peer-deps`. `@testing-library/dom` must be an explicit devDependency (not just a transitive peer) or `npm ci` will fail with missing packages.
+
+## Claude Code Hooks
+
+Configured in `.claude/settings.json`:
+
+**Pre-push test coverage check** — fires on `Bash(git push *)`. Diffs commits to be pushed against the upstream and checks that every changed `src/lib/` or `src/components/` file has a corresponding `__tests__/*.test.ts`. Prompts for confirmation (not a hard block) if any are missing. Script lives at `.claude/hooks/check-tests-before-push.sh`.
+
+**Missing test reminder** — fires on `Write|Edit`. After writing a source file under `src/lib/` or `src/components/`, checks whether a test file exists for it and injects a reminder into Claude's context if not.
 
 ## Local Dev with Supabase (optional)
 
