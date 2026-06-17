@@ -3,6 +3,7 @@ import { getCategoryFeed, type SortMode } from '@/lib/queries/posts'
 import { getCategory } from '@/lib/queries/categories'
 import { PostFeed } from '@/components/feed/PostFeed'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { CategoryIcon } from '@/lib/categoryIcons'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category: slug } = await params
   const cat = await getCategory(slug)
   if (!cat) return {}
-  return { title: `${cat.icon} ${cat.name} — Vibehaus` }
+  return { title: `${cat.name} — Vibehaus` }
 }
 
 export default async function CategoryPage({ params, searchParams }: Props) {
@@ -36,7 +37,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       <section>
         <div className="mb-4">
           <h1 className="text-xl font-bold flex items-center gap-2">
-            <span>{cat.icon}</span>
+            <CategoryIcon slug={cat.slug} className="w-5 h-5" />
             {cat.name}
           </h1>
           {cat.description && (

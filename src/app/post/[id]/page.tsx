@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from '@/lib/utils'
+import { CategoryIcon } from '@/lib/categoryIcons'
 import type { Metadata } from 'next'
 import type { CommentWithAuthor } from '@/lib/supabase/types'
 
@@ -44,7 +45,7 @@ export default async function PostPage({ params }: Props) {
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
               {category && (
                 <Link href={`/c/${category.slug}`} className="hover:text-foreground">
-                  {category.icon} {category.name}
+                  <CategoryIcon slug={category.slug} className="w-3.5 h-3.5 inline-block" /> {category.name}
                 </Link>
               )}
               <span>·</span>

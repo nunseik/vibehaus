@@ -4,6 +4,7 @@ import { getCategories } from '@/lib/queries/categories'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Star, Layers } from 'lucide-react'
+import { CategoryIcon } from '@/lib/categoryIcons'
 
 export async function Sidebar() {
   const [featuredUsers, categories] = await Promise.all([
@@ -50,7 +51,7 @@ export async function Sidebar() {
                 href={`/c/${cat.slug}`}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span>{cat.icon}</span>
+                <CategoryIcon slug={cat.slug} />
                 <span>{cat.name}</span>
               </Link>
             </li>

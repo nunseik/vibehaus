@@ -5,6 +5,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { signOut } from '@/lib/actions/profile'
 import { Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CategoryIcon } from '@/lib/categoryIcons'
 
 export async function Navbar() {
   const supabase = await createClient()
@@ -26,7 +27,7 @@ export async function Navbar() {
               href={`/c/${cat.slug}`}
               className="px-2.5 py-1 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors whitespace-nowrap"
             >
-              {cat.icon} {cat.name}
+              {cat.name}
             </Link>
           ))}
         </nav>
