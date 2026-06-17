@@ -6,76 +6,44 @@ A Reddit/Facebook-style community platform for vibe coders — people who build 
 
 | Layer | Tool |
 |---|---|
-| Framework | Next.js 15 (App Router, Server Components, Server Actions) |
-| Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (magic link + GitHub OAuth) |
+| Framework | Next.js 16 (App Router, Server Components, Server Actions) |
+| Database | Supabase cloud (PostgreSQL) — project `tczeoaadasbgxjwhnklc` |
+| Auth | Supabase Auth (email/password + Google OAuth + GitHub OAuth) |
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | Icons | Lucide React |
 
-## Local Dev Setup
+## Dev Setup
 
 ### Prerequisites
 - Node.js 20+
-- A Docker-compatible runtime. **Colima** works (no Docker Desktop required).
-
-### Using Colima (instead of Docker Desktop)
-```bash
-colima start --cpu 2 --memory 4
-```
-Colima exposes its socket at `~/.colima/default/docker.sock`. The Supabase
-CLI defaults to `/var/run/docker.sock`, so prefix every `supabase` command
-with `DOCKER_HOST`:
-```bash
-export DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
-```
-Add that line to your `~/.zshrc` to avoid repeating it. (Alternatively,
-`sudo ln -s ~/.colima/default/docker.sock /var/run/docker.sock`.)
-
-> Note: `[analytics]` is disabled in `supabase/config.toml`. Its `vector`
-> container tries to bind-mount the Docker socket, which fails on Colima's
-> forwarded socket. Analytics/logging is optional for local dev.
 
 ### 1. Install dependencies
 ```bash
 npm install
 ```
 
-### 2. Start local Supabase
-```bash
-npx supabase start
-```
-This prints your local credentials. Copy the `API URL` and `anon key`
-(run `npx supabase status` to see them again). Note: recent CLI versions
-also show new-style `PUBLISHABLE_KEY`/`SECRET_KEY` — but the legacy
-`ANON_KEY` JWT is what `.env.local` uses.
-
-### 3. Set up environment
+### 2. Set up environment
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local with values from `supabase start` output
+# Fill in values from Supabase Dashboard → Project Settings → API
 ```
 
-### 4. Run migrations
-```bash
-npx supabase db reset
-# or for incremental:
-npx supabase migration up
-```
-
-### 5. Start the dev server
+### 3. Start the dev server
 ```bash
 npm run dev
 ```
 
 Open http://localhost:3000.
 
-### Useful Supabase commands
-```bash
-npx supabase status          # show running services + credentials
-npx supabase db studio       # open database UI at localhost:54323
-npx supabase db reset        # wipe and re-run all migrations
-npx supabase stop            # stop local containers
-```
+> **Port 3000 is required** — OAuth callbacks (Google, GitHub) are configured to redirect through it. If port 3000 is in use, free it before starting.
+
+## Environment Variables
+
+| Variable | Where to find it |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Dashboard → Project Settings → API (publishable/anon key) |
+| `SUPABASE_SECRET_KEY` | Supabase Dashboard → Project Settings → API (secret key — only needed for `scripts/seed.js`) |
 
 ## Project Structure
 
@@ -83,7 +51,8 @@ npx supabase stop            # stop local containers
 src/
 ├── app/                    # Next.js App Router pages
 │   ├── page.tsx            # Home feed
-│   ├── auth/page.tsx       # Sign in / sign up
+│   ├── auth/page.tsx       # Sign in / sign up (email+password, Google, GitHub)
+│   ├── auth/callback/      # OAuth + magic link callback handler
 │   ├── c/[category]/       # Category feed
 │   ├── post/[id]/          # Single post + comments
 │   ├── submit/             # Create post
@@ -98,12 +67,15 @@ src/
 │   ├── supabase/           # client.ts, server.ts, types.ts
 │   ├── actions/            # Server actions: posts, votes, comments, profile
 │   └── queries/            # Read-only DB queries: posts, users, categories
-└── middleware.ts            # Session refresh (required by @supabase/ssr)
+└── proxy.ts                # Session refresh middleware (required by @supabase/ssr)
+scripts/
+└── seed.js                 # Demo data seed (5 users, 8 posts, votes, comments)
 ```
 
 ## Database Schema
 
-All migrations are in `supabase/migrations/`. Run `npx supabase db reset` to apply all of them.
+All migrations are in `supabase/migrations/`. The cloud DB is already up to date.
+To push new migrations: `npx supabase db push`.
 
 | Migration | What it creates |
 |---|---|
@@ -146,20 +118,45 @@ All migrations are in `supabase/migrations/`. Run `npx supabase db reset` to app
 ### Voting
 Voting uses React 19's `useOptimistic` in `VoteButtons.tsx` for instant UI feedback. The DB trigger in `005_votes.sql` handles score recalculation atomically. Voting the same value twice toggles the vote off (handled in `src/lib/actions/votes.ts`).
 
-## Environment Variables
+### Auth
+- Email/password — `signInWithPassword` / `signUp` (email confirmation disabled for now)
+- OAuth — `signInWithOAuth({ provider: 'google' | 'github' })` redirects to `/auth/callback`
+- Session refresh — `src/proxy.ts` runs on every request via Next.js middleware
 
-| Variable | Description |
+## Seeding Demo Data
+
+```bash
+# Requires SUPABASE_SECRET_KEY in .env.local
+node scripts/seed.js
+```
+
+Creates 5 users (password: `demo1234`): `cursor_wizard`, `prompt_poet`, `zero_to_saas`, `debug_duchess`, `model_hopper`.
+
+## Deploying to Vercel
+
+1. Push changes to GitHub (`git push`)
+2. Import repo at vercel.com → New Project
+3. Add env vars: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+4. Deploy — Vercel auto-detects Next.js
+5. After deploy, add production URL to Supabase Auth → URL Configuration:
+   - Site URL: `https://your-app.vercel.app`
+   - Redirect URLs: `https://your-app.vercel.app/**`
+6. Add production URL to Google OAuth app (Homepage URL + callback)
+7. Add production URL to GitHub OAuth app (Homepage URL + callback)
+
+## OAuth Setup
+
+Both providers use the same Supabase callback URL:
+```
+https://tczeoaadasbgxjwhnklc.supabase.co/auth/v1/callback
+```
+
+| Provider | Where to configure |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (local: `http://127.0.0.1:54321`) |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| Google | console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client |
+| GitHub | github.com → Settings → Developer settings → OAuth Apps |
 
-## Deploying to Production
-
-1. Create a project at supabase.com
-2. Run `npx supabase db push` to apply migrations to the cloud project
-3. Enable GitHub OAuth in Supabase Dashboard → Auth → Providers
-4. Add the production URL as a redirect URL in Supabase Auth settings
-5. Deploy to Vercel: `npx vercel` and set the two env vars
+Enable each provider in Supabase Dashboard → Authentication → Providers.
 
 ## Running Tests / Type Checks
 
@@ -167,3 +164,7 @@ Voting uses React 19's `useOptimistic` in `VoteButtons.tsx` for instant UI feedb
 npm run build       # full type check + build
 npx tsc --noEmit    # type check only
 ```
+
+## Local Dev with Supabase (optional)
+
+If you want to develop against a local Supabase instance instead of the cloud project, you'll need Docker or Colima. See git history for the original local setup instructions, or refer to the [Supabase local dev docs](https://supabase.com/docs/guides/local-development).
