@@ -130,6 +130,7 @@
   }
 }
 
-body.has-bg {
+body.has-bg,
+html:has(body.has-bg) {
   background-color: transparent;
 }
