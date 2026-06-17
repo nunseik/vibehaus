@@ -16,7 +16,7 @@ export async function Sidebar() {
   return (
     <aside className="space-y-6">
       {featuredUsers.length > 0 && (
-        <div className="rounded-lg border border-border p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <h2 className="flex items-center gap-1.5 font-semibold text-sm mb-3">
             <Star className="w-4 h-4 text-emerald-500" />
             Featured Vibers
@@ -40,7 +40,7 @@ export async function Sidebar() {
         </div>
       )}
 
-      <div className="rounded-lg border border-border p-4">
+      <div className="rounded-lg border border-border bg-card p-4">
         <h2 className="flex items-center gap-1.5 font-semibold text-sm mb-3">
           <Layers className="w-4 h-4" />
           Categories

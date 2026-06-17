@@ -19,7 +19,7 @@ const SORT_TABS: { label: string; value: SortMode }[] = [
 export function PostFeed({ posts, sort, baseHref }: PostFeedProps) {
   return (
     <div>
-      <div className="flex gap-1 mb-4 border-b border-border pb-3">
+      <div className="flex gap-1 mb-4">
         {SORT_TABS.map((tab) => (
           <Link
             key={tab.value}
@@ -27,8 +27,8 @@ export function PostFeed({ posts, sort, baseHref }: PostFeedProps) {
             className={cn(
               'px-3 py-1.5 text-sm rounded-md transition-colors',
               sort === tab.value
-                ? 'bg-muted text-foreground font-medium'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                ? 'bg-card text-foreground font-medium'
+                : 'bg-card/50 text-muted-foreground hover:bg-card/75 hover:text-foreground'
             )}
           >
             {tab.label}

@@ -15,6 +15,7 @@ export interface Database {
           favorite_models: string[]
           tech_stack: string[]
           languages: string[]
+          background_image_url: string | null
           created_at: string
           updated_at: string
         }
@@ -29,6 +30,7 @@ export interface Database {
           favorite_models?: string[]
           tech_stack?: string[]
           languages?: string[]
+          background_image_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -42,6 +44,7 @@ export interface Database {
           favorite_models?: string[]
           tech_stack?: string[]
           languages?: string[]
+          background_image_url?: string | null
           updated_at?: string
         }
         Relationships: []

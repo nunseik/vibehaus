@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { AvatarPicker } from '@/components/profile/AvatarPicker'
+import { BackgroundPicker } from '@/components/profile/BackgroundPicker'
 
 export const metadata = { title: 'Settings — Vibehaus' }
 
@@ -84,6 +85,12 @@ export default async function SettingsPage() {
             placeholder="TypeScript, Python, Rust"
           />
           <p className="text-xs text-muted-foreground">Comma-separated</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>Background Image</Label>
+          <p className="text-xs text-muted-foreground">Search Unsplash and pick a background for your whole site experience.</p>
+          <BackgroundPicker currentUrl={profile.background_image_url} />
         </div>
 
         <Button type="submit" className="w-full">Save changes</Button>

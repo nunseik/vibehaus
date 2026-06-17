@@ -22,6 +22,7 @@ export async function updateProfile(formData: FormData) {
     ?.split(',').map((s) => s.trim()).filter(Boolean) ?? []
 
   const avatarUrl = formData.get('avatar_url') as string | null
+  const backgroundImageUrl = formData.get('background_image_url') as string | null
 
   const { error } = await supabase
     .from('profiles')
@@ -35,6 +36,7 @@ export async function updateProfile(formData: FormData) {
       tech_stack: techStack,
       languages,
       avatar_url: avatarUrl || null,
+      background_image_url: backgroundImageUrl || null,
     })
     .eq('id', user.id)
 

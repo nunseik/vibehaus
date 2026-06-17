@@ -17,7 +17,7 @@ export function PostCard({ post, userVote = null }: PostCardProps) {
   const category = post.categories
 
   return (
-    <article className="flex gap-3 px-4 py-3.5 bg-card border border-border border-l-2 border-l-emerald-500 hover:bg-muted/40 transition-colors rounded-r-lg">
+    <article className="flex gap-3 px-4 py-3.5 bg-card border border-border border-l-2 border-l-emerald-500 hover:bg-muted transition-colors rounded-r-lg">
       <VoteButtons postId={post.id} initialScore={post.score} initialUserVote={userVote} />
 
       <div className="flex-1 min-w-0">

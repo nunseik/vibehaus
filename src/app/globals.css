@@ -129,3 +129,7 @@
     font-family: var(--font-geist-sans), sans-serif;
   }
 }
+
+body.has-bg {
+  background-color: transparent;
+}
