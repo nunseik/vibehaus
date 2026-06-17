@@ -13,8 +13,8 @@ export function BackgroundApplier({ url }: { url: string | null }) {
   if (!url) return null
   return (
     <div
-      className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${url})` }}
+      className="fixed top-0 left-0 right-0 -z-10 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${url})`, bottom: '-30vh' }}
     >
       <div className="absolute inset-0 bg-black/55" />
     </div>
