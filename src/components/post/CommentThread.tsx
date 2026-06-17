@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getAvatarUrl } from '@/lib/avatar'
 import { Button } from '@/components/ui/button'
 import { CommentForm } from './CommentForm'
 import { formatDistanceToNow } from '@/lib/utils'
@@ -25,7 +26,7 @@ function CommentItem({ comment, postId, depth = 0 }: { comment: CommentWithAutho
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
           <Link href={`/u/${author?.username}`} className="flex items-center gap-1 hover:text-foreground transition-colors">
             <Avatar className="w-4 h-4">
-              <AvatarImage src={author?.avatar_url ?? undefined} />
+              <AvatarImage src={getAvatarUrl(author?.username, author?.avatar_url)} />
               <AvatarFallback>{author?.username?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             @{author?.username}

@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { ExternalLink, Pencil } from 'lucide-react'
 import { formatDistanceToNow } from '@/lib/utils'
 import { CategoryIcon } from '@/lib/categoryIcons'
+import { getAvatarUrl } from '@/lib/avatar'
 import { buttonVariants } from '@/components/ui/button'
 import { DeletePostButton } from '@/components/post/DeletePostButton'
 import { cn } from '@/lib/utils'
@@ -54,7 +55,7 @@ export default async function PostPage({ params }: Props) {
               <span>·</span>
               <Link href={`/u/${author?.username}`} className="flex items-center gap-1 hover:text-foreground">
                 <Avatar className="w-4 h-4">
-                  <AvatarImage src={author?.avatar_url ?? undefined} />
+                  <AvatarImage src={getAvatarUrl(author?.username, author?.avatar_url)} />
                   <AvatarFallback>{author?.username?.[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
                 @{author?.username}

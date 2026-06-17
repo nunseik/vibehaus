@@ -7,6 +7,7 @@ import { signOut } from '@/lib/actions/profile'
 import { Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CategoryIcon } from '@/lib/categoryIcons'
+import { getAvatarUrl } from '@/lib/avatar'
 
 export async function Navbar() {
   const [categories, currentUser] = await Promise.all([getCategories(), getCurrentUser()])
@@ -37,7 +38,7 @@ export async function Navbar() {
               <Link href="/submit" className={cn(buttonVariants({ size: 'sm' }))}>+ Post</Link>
               <Link href={`/u/${currentUser.username}`}>
                 <Avatar className="w-7 h-7">
-                  <AvatarImage src={currentUser.avatar_url ?? undefined} />
+                  <AvatarImage src={getAvatarUrl(currentUser.username, currentUser.avatar_url)} />
                   <AvatarFallback className="text-xs">{currentUser.username?.[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
               </Link>

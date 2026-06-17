@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Star, Layers } from 'lucide-react'
 import { CategoryIcon } from '@/lib/categoryIcons'
+import { getAvatarUrl } from '@/lib/avatar'
 
 export async function Sidebar() {
   const [featuredUsers, categories] = await Promise.all([
@@ -25,7 +26,7 @@ export async function Sidebar() {
               <li key={u.author_id}>
                 <Link href={`/u/${u.username ?? ''}`} className="flex items-center gap-2 group">
                   <Avatar className="w-7 h-7">
-                    <AvatarImage src={u.avatar_url ?? undefined} />
+                    <AvatarImage src={getAvatarUrl(u.username, u.avatar_url)} />
                     <AvatarFallback>{(u.username ?? '?')[0].toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { formatDistanceToNow } from '@/lib/utils'
 import { VoteButtons } from './VoteButtons'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getAvatarUrl } from '@/lib/avatar'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, ExternalLink } from 'lucide-react'
 import type { PostWithAuthor } from '@/lib/supabase/types'
@@ -29,7 +30,7 @@ export function PostCard({ post, userVote = null }: PostCardProps) {
           <span className="text-border">·</span>
           <Link href={`/u/${author?.username}`} className="flex items-center gap-1 hover:text-foreground transition-colors">
             <Avatar className="w-3.5 h-3.5">
-              <AvatarImage src={author?.avatar_url ?? undefined} />
+              <AvatarImage src={getAvatarUrl(author?.username, author?.avatar_url)} />
               <AvatarFallback>{author?.username?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             @{author?.username}

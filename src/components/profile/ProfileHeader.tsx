@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getAvatarUrl } from '@/lib/avatar'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Link2, X, Globe, Bot, Code2, Wrench } from 'lucide-react'
@@ -16,7 +17,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
     <div className="rounded-lg border border-border p-6 space-y-4">
       <div className="flex items-start gap-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={profile.avatar_url ?? undefined} />
+          <AvatarImage src={getAvatarUrl(profile.username, profile.avatar_url)} />
           <AvatarFallback className="text-xl">{profile.username[0].toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">

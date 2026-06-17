@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { AvatarPicker } from '@/components/profile/AvatarPicker'
 
 export const metadata = { title: 'Settings — Vibehaus' }
 
@@ -21,6 +22,11 @@ export default async function SettingsPage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-xl font-bold mb-6">Profile Settings</h1>
       <form action={updateProfile} className="space-y-5">
+        <div className="space-y-1.5">
+          <Label>Avatar</Label>
+          <AvatarPicker currentAvatarUrl={profile.avatar_url} />
+        </div>
+
         <div className="space-y-1.5">
           <Label htmlFor="username">Username *</Label>
           <Input id="username" name="username" defaultValue={profile.username} required />

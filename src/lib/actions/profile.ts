@@ -21,6 +21,8 @@ export async function updateProfile(formData: FormData) {
   const languages = (formData.get('languages') as string | null)
     ?.split(',').map((s) => s.trim()).filter(Boolean) ?? []
 
+  const avatarUrl = formData.get('avatar_url') as string | null
+
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -32,6 +34,7 @@ export async function updateProfile(formData: FormData) {
       favorite_models: favoriteModels,
       tech_stack: techStack,
       languages,
+      avatar_url: avatarUrl || null,
     })
     .eq('id', user.id)
 
