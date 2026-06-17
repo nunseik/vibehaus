@@ -1,16 +1,15 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { getCategories } from '@/lib/queries/categories'
+import { getCurrentUser } from '@/lib/queries/users'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { signOut } from '@/lib/actions/profile'
 import { Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CategoryIcon } from '@/lib/categoryIcons'
 
 export async function Navbar() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const categories = await getCategories()
+  const [categories, currentUser] = await Promise.all([getCategories(), getCurrentUser()])
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
@@ -33,9 +32,15 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 ml-auto">
-          {user ? (
+          {currentUser ? (
             <>
               <Link href="/submit" className={cn(buttonVariants({ size: 'sm' }))}>+ Post</Link>
+              <Link href={`/u/${currentUser.username}`}>
+                <Avatar className="w-7 h-7">
+                  <AvatarImage src={currentUser.avatar_url ?? undefined} />
+                  <AvatarFallback className="text-xs">{currentUser.username?.[0]?.toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </Link>
               <form action={signOut}>
                 <Button variant="ghost" size="sm" type="submit">Sign out</Button>
               </form>
