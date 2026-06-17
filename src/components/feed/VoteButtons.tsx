@@ -37,7 +37,7 @@ export function VoteButtons({ postId, initialScore, initialUserVote }: VoteButto
         onClick={() => handleVote(1)}
         className={cn(
           'p-1 rounded hover:bg-muted transition-colors',
-          optimistic.userVote === 1 ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground'
+          optimistic.userVote === 1 ? 'text-emerald-600' : 'text-muted-foreground hover:text-foreground'
         )}
         aria-label="Upvote"
       >
@@ -45,8 +45,8 @@ export function VoteButtons({ postId, initialScore, initialUserVote }: VoteButto
       </button>
       <span className={cn(
         'text-xs font-semibold tabular-nums',
-        optimistic.userVote === 1 && 'text-orange-500',
-        optimistic.userVote === -1 && 'text-blue-500'
+        optimistic.userVote === 1 && 'text-emerald-600',
+        optimistic.userVote === -1 && 'text-muted-foreground'
       )}>
         {optimistic.score}
       </span>
@@ -54,7 +54,7 @@ export function VoteButtons({ postId, initialScore, initialUserVote }: VoteButto
         onClick={() => handleVote(-1)}
         className={cn(
           'p-1 rounded hover:bg-muted transition-colors',
-          optimistic.userVote === -1 ? 'text-blue-500' : 'text-muted-foreground hover:text-foreground'
+          optimistic.userVote === -1 ? 'text-zinc-400' : 'text-muted-foreground hover:text-foreground'
         )}
         aria-label="Downvote"
       >

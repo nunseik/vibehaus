@@ -15,7 +15,7 @@ export async function Navbar() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-4">
         <Link href="/" className="flex items-center gap-1.5 font-bold text-lg mr-2">
-          <Zap className="w-5 h-5 text-yellow-400" />
+          <Zap className="w-5 h-5 text-emerald-500" />
           <span>Vibehaus</span>
         </Link>
 

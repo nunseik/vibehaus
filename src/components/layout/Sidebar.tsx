@@ -16,7 +16,7 @@ export async function Sidebar() {
       {featuredUsers.length > 0 && (
         <div className="rounded-lg border border-border p-4">
           <h2 className="flex items-center gap-1.5 font-semibold text-sm mb-3">
-            <Star className="w-4 h-4 text-yellow-400" />
+            <Star className="w-4 h-4 text-emerald-500" />
             Featured Vibers
           </h2>
           <ul className="space-y-3">
