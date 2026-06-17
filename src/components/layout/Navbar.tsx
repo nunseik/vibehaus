@@ -8,6 +8,7 @@ import { Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { CategoryIcon } from '@/lib/categoryIcons'
 import { getAvatarUrl } from '@/lib/avatar'
+import { ThemeToggle } from './ThemeToggle'
 
 export async function Navbar() {
   const [categories, currentUser] = await Promise.all([getCategories(), getCurrentUser()])
@@ -33,6 +34,7 @@ export async function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2 ml-auto">
+          <ThemeToggle />
           {currentUser ? (
             <>
               <Link href="/submit" className={cn(buttonVariants({ size: 'sm' }))}>+ Post</Link>
