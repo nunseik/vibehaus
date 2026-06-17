@@ -41,6 +41,44 @@ export async function createPost(formData: FormData) {
   redirect(`/post/${post.id}`)
 }
 
+export async function updatePost(postId: string, formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const title = formData.get('title') as string
+  const body = formData.get('body') as string | null
+  const url = formData.get('url') as string | null
+  const categoryId = formData.get('category_id') as string | null
+  const tagIds = formData.getAll('tag_ids') as string[]
+
+  if (!title?.trim()) throw new Error('Title is required')
+
+  const { error } = await supabase
+    .from('posts')
+    .update({
+      title: title.trim(),
+      body: body?.trim() || null,
+      url: url?.trim() || null,
+      category_id: categoryId ? parseInt(categoryId) : null,
+    })
+    .eq('id', postId)
+    .eq('author_id', user.id)
+
+  if (error) throw error
+
+  await supabase.from('post_tags').delete().eq('post_id', postId)
+  if (tagIds.length) {
+    await supabase.from('post_tags').insert(
+      tagIds.map((tid) => ({ post_id: postId, tag_id: parseInt(tid) }))
+    )
+  }
+
+  revalidatePath(`/post/${postId}`)
+  revalidatePath('/')
+  redirect(`/post/${postId}`)
+}
+
 export async function deletePost(postId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

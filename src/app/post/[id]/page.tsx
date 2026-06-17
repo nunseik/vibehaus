@@ -8,9 +8,12 @@ import { CommentThread } from '@/components/post/CommentThread'
 import { CommentForm } from '@/components/post/CommentForm'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Pencil } from 'lucide-react'
 import { formatDistanceToNow } from '@/lib/utils'
 import { CategoryIcon } from '@/lib/categoryIcons'
+import { buttonVariants } from '@/components/ui/button'
+import { DeletePostButton } from '@/components/post/DeletePostButton'
+import { cn } from '@/lib/utils'
 import type { Metadata } from 'next'
 import type { CommentWithAuthor } from '@/lib/supabase/types'
 
@@ -60,7 +63,20 @@ export default async function PostPage({ params }: Props) {
               <time>{formatDistanceToNow(post.created_at)}</time>
             </div>
 
-            <h1 className="text-xl font-bold leading-snug">{post.title}</h1>
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-xl font-bold leading-snug">{post.title}</h1>
+              {user?.id === post.author_id && (
+                <div className="flex items-center gap-1 shrink-0">
+                  <Link
+                    href={`/post/${post.id}/edit`}
+                    className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'h-7 px-2 text-muted-foreground')}
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Link>
+                  <DeletePostButton postId={post.id} />
+                </div>
+              )}
+            </div>
 
             {post.url && (
               <a href={post.url} target="_blank" rel="noopener noreferrer"

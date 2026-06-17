@@ -1,23 +1,33 @@
 'use client'
 
-import { useTransition } from 'react'
-import { createPost } from '@/lib/actions/posts'
+import { useTransition, useState } from 'react'
+import { createPost, updatePost } from '@/lib/actions/posts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import type { Category, Tag } from '@/lib/supabase/types'
-import { useState } from 'react'
 
 interface PostFormProps {
   categories: Category[]
   tags: Tag[]
+  post?: {
+    id: string
+    title: string
+    body: string | null
+    url: string | null
+    category_id: number | null
+    tags: { id: number }[]
+  }
 }
 
-export function PostForm({ categories, tags }: PostFormProps) {
+export function PostForm({ categories, tags, post }: PostFormProps) {
   const [isPending, startTransition] = useTransition()
-  const [selectedTags, setSelectedTags] = useState<number[]>([])
+  const [selectedTags, setSelectedTags] = useState<number[]>(
+    post?.tags.map((t) => t.id) ?? []
+  )
+  const isEditing = !!post
 
   function toggleTag(id: number) {
     setSelectedTags((prev) =>
@@ -28,7 +38,11 @@ export function PostForm({ categories, tags }: PostFormProps) {
   function handleSubmit(formData: FormData) {
     selectedTags.forEach((id) => formData.append('tag_ids', String(id)))
     startTransition(async () => {
-      await createPost(formData)
+      if (isEditing) {
+        await updatePost(post.id, formData)
+      } else {
+        await createPost(formData)
+      }
     })
   }
 
@@ -36,12 +50,25 @@ export function PostForm({ categories, tags }: PostFormProps) {
     <form action={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
         <Label htmlFor="title">Title *</Label>
-        <Input id="title" name="title" placeholder="What are you sharing?" required maxLength={300} />
+        <Input
+          id="title"
+          name="title"
+          placeholder="What are you sharing?"
+          required
+          maxLength={300}
+          defaultValue={post?.title ?? ''}
+        />
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="url">Link (optional)</Label>
-        <Input id="url" name="url" type="url" placeholder="https://..." />
+        <Input
+          id="url"
+          name="url"
+          type="url"
+          placeholder="https://..."
+          defaultValue={post?.url ?? ''}
+        />
       </div>
 
       <div className="space-y-1.5">
@@ -52,6 +79,7 @@ export function PostForm({ categories, tags }: PostFormProps) {
           placeholder="Share more details, code snippets, or context..."
           rows={6}
           className="resize-y"
+          defaultValue={post?.body ?? ''}
         />
       </div>
 
@@ -60,6 +88,7 @@ export function PostForm({ categories, tags }: PostFormProps) {
         <select
           id="category_id"
           name="category_id"
+          defaultValue={post?.category_id ?? ''}
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">Select a category</option>
@@ -75,11 +104,7 @@ export function PostForm({ categories, tags }: PostFormProps) {
         <Label>Tags</Label>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <button
-              key={tag.id}
-              type="button"
-              onClick={() => toggleTag(tag.id)}
-            >
+            <button key={tag.id} type="button" onClick={() => toggleTag(tag.id)}>
               <Badge
                 variant={selectedTags.includes(tag.id) ? 'default' : 'outline'}
                 className="cursor-pointer"
@@ -92,7 +117,7 @@ export function PostForm({ categories, tags }: PostFormProps) {
       </div>
 
       <Button type="submit" disabled={isPending} className="w-full">
-        {isPending ? 'Publishing…' : 'Publish Post'}
+        {isPending ? (isEditing ? 'Saving…' : 'Publishing…') : (isEditing ? 'Save Changes' : 'Publish Post')}
       </Button>
     </form>
   )
