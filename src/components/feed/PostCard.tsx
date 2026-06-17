@@ -40,7 +40,7 @@ export function PostCard({ post, userVote = null }: PostCardProps) {
 
         <div className="flex items-start gap-2">
           <Link href={`/post/${post.id}`} className="flex-1">
-            <h2 className="font-semibold text-sm leading-snug text-foreground hover:text-primary transition-colors line-clamp-2">
+            <h2 className="font-semibold text-sm leading-snug text-foreground hover:text-primary transition-colors line-clamp-2 uppercase tracking-wide">
               {post.title}
             </h2>
           </Link>
