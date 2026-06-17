@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans, Geist_Mono } from 'next/font/google'
+import { cookies } from 'next/headers'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { BackgroundLoader } from '@/components/layout/BackgroundLoader'
-
-const themeScript = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`
 
 const ibmPlexSans = IBM_Plex_Sans({ variable: '--font-geist-sans', subsets: ['latin'], weight: ['400', '500', '600', '700'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
@@ -14,12 +13,13 @@ export const metadata: Metadata = {
   description: 'Share tips, tricks, and builds with the vibe coding community.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies()
+  const theme = cookieStore.get('theme')?.value
+  const isDark = theme === 'dark'
+
   return (
-    <html lang="en" className={`${ibmPlexSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang="en" className={`${ibmPlexSans.variable} ${geistMono.variable} h-full antialiased${isDark ? ' dark' : ''}`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <BackgroundLoader />
         <Navbar />
