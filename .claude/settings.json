@@ -6,6 +6,12 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // empty'); [[ \"$cmd\" != git\\ commit* ]] && exit 0; bash .claude/hooks/run-tests-before-commit.sh",
+            "statusMessage": "Running tests before commit...",
+            "timeout": 60
+          },
+          {
+            "type": "command",
             "command": "cmd=$(jq -r '.tool_input.command // empty'); [[ \"$cmd\" != git\\ push* ]] && exit 0; bash .claude/hooks/check-tests-before-push.sh",
             "statusMessage": "Checking test coverage before push..."
           }
