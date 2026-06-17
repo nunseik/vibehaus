@@ -6,26 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { CommentForm } from './CommentForm'
 import { formatDistanceToNow } from '@/lib/utils'
+import { buildTree } from '@/lib/commentTree'
 import type { CommentWithAuthor } from '@/lib/supabase/types'
 
 interface CommentThreadProps {
   comments: CommentWithAuthor[]
   postId: string
   depth?: number
-}
-
-function buildTree(comments: CommentWithAuthor[]): CommentWithAuthor[] {
-  const map = new Map<string, CommentWithAuthor>()
-  const roots: CommentWithAuthor[] = []
-  comments.forEach((c) => map.set(c.id, { ...c, replies: [] }))
-  map.forEach((c) => {
-    if (c.parent_id && map.has(c.parent_id)) {
-      map.get(c.parent_id)!.replies!.push(c)
-    } else {
-      roots.push(c)
-    }
-  })
-  return roots
 }
 
 function CommentItem({ comment, postId, depth = 0 }: { comment: CommentWithAuthor; postId: string; depth?: number }) {

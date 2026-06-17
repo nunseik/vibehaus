@@ -10,7 +10,7 @@ const POST_SELECT = `
   tags:post_tags ( tags ( id, slug, name ) )
 `
 
-function getOrderColumns(sort: SortMode): { column: string; ascending: boolean }[] {
+export function getOrderColumns(sort: SortMode): { column: string; ascending: boolean }[] {
   switch (sort) {
     case 'new':
       return [{ column: 'created_at', ascending: false }]
@@ -28,7 +28,7 @@ function getOrderColumns(sort: SortMode): { column: string; ascending: boolean }
 }
 
 // Supabase returns nested tags as [{ tags: { id, slug, name } }] — flatten them
-function normalizePostTags(posts: unknown[]): PostWithAuthor[] {
+export function normalizePostTags(posts: unknown[]): PostWithAuthor[] {
   return (posts as PostWithAuthor[]).map((post) => ({
     ...post,
     tags: (
