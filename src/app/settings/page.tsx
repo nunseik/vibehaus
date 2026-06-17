@@ -21,6 +21,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="bg-card rounded-lg border border-border p-6">
       <h1 className="text-xl font-bold mb-6">Profile Settings</h1>
       <form action={updateProfile} className="space-y-5">
         <div className="space-y-1.5">
@@ -95,6 +96,7 @@ export default async function SettingsPage() {
 
         <Button type="submit" className="w-full">Save changes</Button>
       </form>
+      </div>
     </div>
   )
 }

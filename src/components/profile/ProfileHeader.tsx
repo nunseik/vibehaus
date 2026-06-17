@@ -14,7 +14,7 @@ interface ProfileHeaderProps {
 
 export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
   return (
-    <div className="rounded-lg border border-border p-6 space-y-4">
+    <div className="rounded-lg border border-border bg-card p-6 space-y-4">
       <div className="flex items-start gap-4">
         <Avatar className="w-16 h-16">
           <AvatarImage src={getAvatarUrl(profile.username, profile.avatar_url)} />

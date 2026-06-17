@@ -35,7 +35,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
       <section>
-        <div className="mb-4">
+        <div className="mb-4 bg-card rounded-lg border border-border p-4">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <CategoryIcon slug={cat.slug} className="w-5 h-5" />
             {cat.name}

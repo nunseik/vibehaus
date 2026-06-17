@@ -42,7 +42,7 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <article className="rounded-lg border border-border p-5">
+      <article className="rounded-lg border border-border bg-card p-5">
         <div className="flex gap-4">
           <VoteButtons postId={post.id} initialScore={post.score} initialUserVote={userVote} />
           <div className="flex-1 min-w-0">
@@ -102,7 +102,7 @@ export default async function PostPage({ params }: Props) {
         </div>
       </article>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-4 bg-card rounded-lg border border-border p-5">
         <h2 className="font-semibold text-sm">{post.comment_count} Comments</h2>
 
         {user ? (

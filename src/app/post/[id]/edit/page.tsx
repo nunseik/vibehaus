@@ -24,19 +24,21 @@ export default async function EditPostPage({ params }: Props) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-xl font-bold mb-6">Edit Post</h1>
-      <PostForm
-        categories={categories}
-        tags={tags}
-        post={{
-          id: post.id,
-          title: post.title,
-          body: post.body,
-          url: post.url,
-          category_id: post.category_id,
-          tags: post.tags ?? [],
-        }}
-      />
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h1 className="text-xl font-bold mb-6">Edit Post</h1>
+        <PostForm
+          categories={categories}
+          tags={tags}
+          post={{
+            id: post.id,
+            title: post.title,
+            body: post.body,
+            url: post.url,
+            category_id: post.category_id,
+            tags: post.tags ?? [],
+          }}
+        />
+      </div>
     </div>
   )
 }

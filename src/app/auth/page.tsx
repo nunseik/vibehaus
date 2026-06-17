@@ -55,7 +55,8 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto px-4 py-16 space-y-8">
+    <div className="max-w-sm mx-auto px-4 py-16">
+      <div className="bg-card rounded-lg border border-border p-8 space-y-8">
       <div className="text-center space-y-2">
         <div className="flex justify-center">
           <Zap className="w-10 h-10 text-yellow-400" />
@@ -80,7 +81,7 @@ export default function AuthPage() {
             <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs text-muted-foreground">
-            <span className="bg-background px-2">or</span>
+            <span className="bg-card px-2">or</span>
           </div>
         </div>
 
@@ -129,6 +130,7 @@ export default function AuthPage() {
             </>
           )}
         </p>
+      </div>
       </div>
     </div>
   )

@@ -14,8 +14,10 @@ export default async function SubmitPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-xl font-bold mb-6">Share something with Vibehaus</h1>
-      <PostForm categories={categories} tags={tags} />
+      <div className="bg-card rounded-lg border border-border p-6">
+        <h1 className="text-xl font-bold mb-6">Share something with Vibehaus</h1>
+        <PostForm categories={categories} tags={tags} />
+      </div>
     </div>
   )
 }
