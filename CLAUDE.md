@@ -11,6 +11,7 @@ A Reddit/Facebook-style community platform for vibe coders — people who build 
 | Auth | Supabase Auth (email/password + Google OAuth + GitHub OAuth) |
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | Icons | Lucide React |
+| Hosting | Vercel — https://vibehaus-one.vercel.app |
 
 ## Dev Setup
 
@@ -35,15 +36,17 @@ npm run dev
 
 Open http://localhost:3000.
 
-> **Port 3000 is required** — OAuth callbacks (Google, GitHub) are configured to redirect through it. If port 3000 is in use, free it before starting.
+> **Port 3000 is required** — OAuth callbacks (Google, GitHub) are hardcoded to redirect through it. If port 3000 is in use, free it before starting.
 
 ## Environment Variables
 
 | Variable | Where to find it |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Dashboard → Project Settings → API (publishable/anon key) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Dashboard → Project Settings → API (publishable key) |
 | `SUPABASE_SECRET_KEY` | Supabase Dashboard → Project Settings → API (secret key — only needed for `scripts/seed.js`) |
+
+> **Vercel gotcha:** `NEXT_PUBLIC_*` vars must be added via `vercel env add` (or the Vercel Dashboard) and the project redeployed. Passing them with `--env` at deploy time does NOT persist them — they'll be missing from future builds and cause 500 errors.
 
 ## Project Structure
 
@@ -52,7 +55,7 @@ src/
 ├── app/                    # Next.js App Router pages
 │   ├── page.tsx            # Home feed
 │   ├── auth/page.tsx       # Sign in / sign up (email+password, Google, GitHub)
-│   ├── auth/callback/      # OAuth + magic link callback handler
+│   ├── auth/callback/      # OAuth callback handler (PKCE code exchange)
 │   ├── c/[category]/       # Category feed
 │   ├── post/[id]/          # Single post + comments
 │   ├── submit/             # Create post
@@ -119,7 +122,7 @@ To push new migrations: `npx supabase db push`.
 Voting uses React 19's `useOptimistic` in `VoteButtons.tsx` for instant UI feedback. The DB trigger in `005_votes.sql` handles score recalculation atomically. Voting the same value twice toggles the vote off (handled in `src/lib/actions/votes.ts`).
 
 ### Auth
-- Email/password — `signInWithPassword` / `signUp` (email confirmation disabled for now)
+- Email/password — `signInWithPassword` / `signUp` (email confirmation disabled)
 - OAuth — `signInWithOAuth({ provider: 'google' | 'github' })` redirects to `/auth/callback`
 - Session refresh — `src/proxy.ts` runs on every request via Next.js middleware
 
@@ -134,29 +137,42 @@ Creates 5 users (password: `demo1234`): `cursor_wizard`, `prompt_poet`, `zero_to
 
 ## Deploying to Vercel
 
-1. Push changes to GitHub (`git push`)
-2. Import repo at vercel.com → New Project
-3. Add env vars: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-4. Deploy — Vercel auto-detects Next.js
-5. After deploy, add production URL to Supabase Auth → URL Configuration:
-   - Site URL: `https://your-app.vercel.app`
-   - Redirect URLs: `https://your-app.vercel.app/**`
-6. Add production URL to Google OAuth app (Homepage URL + callback)
-7. Add production URL to GitHub OAuth app (Homepage URL + callback)
+The project is connected to GitHub (`github.com/nunseik/vibehaus`) and auto-deploys on push to `main`.
+
+To deploy manually:
+```bash
+npx vercel --prod --yes
+```
+
+### First-time setup checklist
+1. Add env vars persistently (do this before deploying):
+   ```bash
+   echo "https://..." | npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
+   echo "sb_publishable_..." | npx vercel env add NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production
+   ```
+2. Deploy: `npx vercel --prod --yes`
+3. Add production URL to Supabase Auth → URL Configuration:
+   - Site URL: `https://vibehaus-one.vercel.app`
+   - Redirect URLs: `https://vibehaus-one.vercel.app/**`
+4. Add production URL to Google OAuth app (Authorized JavaScript origins + callback)
+5. Add production URL to GitHub OAuth app (Homepage URL)
 
 ## OAuth Setup
 
-Both providers use the same Supabase callback URL:
+Both providers redirect through Supabase:
 ```
 https://tczeoaadasbgxjwhnklc.supabase.co/auth/v1/callback
 ```
 
-| Provider | Where to configure |
-|---|---|
-| Google | console.cloud.google.com → APIs & Services → Credentials → OAuth 2.0 Client |
-| GitHub | github.com → Settings → Developer settings → OAuth Apps |
+### Google (console.cloud.google.com → APIs & Services → Credentials)
+- Authorized JavaScript origins: `https://vibehaus-one.vercel.app`, `http://localhost:3000`
+- Authorized redirect URIs: `https://tczeoaadasbgxjwhnklc.supabase.co/auth/v1/callback`
 
-Enable each provider in Supabase Dashboard → Authentication → Providers.
+### GitHub (github.com → Settings → Developer settings → OAuth Apps)
+- Homepage URL: `https://vibehaus-one.vercel.app`
+- Authorization callback URL: `https://tczeoaadasbgxjwhnklc.supabase.co/auth/v1/callback`
+
+Enable both in Supabase Dashboard → Authentication → Providers.
 
 ## Running Tests / Type Checks
 
